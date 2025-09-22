@@ -1,0 +1,68 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": ["Xin chào", "Chào shop", "Hello", "Hi", "Có ai ở đó không?", "Hello shop", "Chào bạn"],
+      "responses": ["Chào bạn! Tôi có thể giúp gì cho bạn hôm nay?", "Chào bạn, shop có thể giúp gì cho bạn ạ?"]
+    },
+    {
+      "tag": "product_search",
+      "patterns": ["Tôi muốn tìm điện thoại", "Có laptop nào giá rẻ không?", "Tìm áo thun nam"],
+      "responses": ["Bạn muốn tìm sản phẩm loại nào?"]
+    },
+    {
+      "tag": "recommendation",
+      "patterns": ["Gợi ý cho tôi vài sản phẩm", "Có sản phẩm nào hot không?", "Đề xuất giúp tôi"],
+      "responses": ["Dưới đây là vài sản phẩm được gợi ý cho bạn..."]
+    },
+    {
+      "tag": "add_to_cart",
+      "patterns": ["Thêm cái này vào giỏ hàng", "Mua sản phẩm này", "Đặt hàng giúp tôi"],
+      "responses": ["Sản phẩm đã được thêm vào giỏ hàng của bạn."]
+    },
+    {
+      "tag": "order_status",
+      "patterns": [
+        "Đơn hàng của tôi đâu rồi?", "Kiểm tra đơn hàng", "Tình trạng đơn hàng của tôi",
+        "Đơn hàng #1234 của tôi đến đâu rồi?", "Ship hàng tới chưa?", "Bao lâu thì nhận được hàng?"
+      ],
+      "responses": [
+        "Bạn vui lòng cung cấp mã đơn hàng để tôi kiểm tra nhé.",
+        "Bạn vui lòng cung cấp mã đơn hàng để shop kiểm tra tình trạng nhé."
+      ]
+    },
+    {
+      "tag": "payment_info",
+      "patterns": ["Thanh toán thế nào?", "Có COD không?", "Có hỗ trợ ví điện tử không?", "Thanh toán có COD không?", "Có thể trả qua Momo không?", "Shop có nhận chuyển khoản không?"],
+      "responses": [
+        "Chúng tôi hỗ trợ thanh toán bằng COD, thẻ ngân hàng và ví điện tử.",
+        "Shop hỗ trợ COD, chuyển khoản ngân hàng và ví điện tử như Momo, ZaloPay."
+      ]
+    },
+    {
+      "tag": "ask_shipping",
+      "patterns": ["Có ship toàn quốc không?", "Shop có giao hàng miễn phí không?", "Phí ship bao nhiêu?"],
+      "responses": ["Shop có ship toàn quốc ạ, đơn trên 500k sẽ được miễn phí vận chuyển."]
+    },
+    {
+      "tag": "ask_return_policy",
+      "patterns": ["Hàng lỗi có được đổi không?", "Chính sách trả hàng thế nào?", "Bao lâu được đổi hàng?"],
+      "responses": ["Bạn có thể đổi trả trong vòng 7 ngày nếu sản phẩm lỗi hoặc chưa sử dụng."]
+    },
+    {
+      "tag": "ask_product_info",
+      "patterns": ["Điện thoại này pin bao nhiêu mAh?", "Áo này có size M không?", "Laptop này bảo hành mấy năm?"],
+      "responses": ["Bạn vui lòng cho shop biết mã sản phẩm để mình tra cứu chi tiết nhé."]
+    },
+    {
+      "tag": "goodbye",
+      "patterns": ["Tạm biệt", "Bye", "Cảm ơn nhiều", "Hẹn gặp lại"],
+      "responses": ["Cảm ơn bạn! Hẹn gặp lại.", "Cảm ơn bạn đã ghé thăm, hẹn gặp lại nhé!"]
+    },
+    {
+      "tag": "fallback",
+      "patterns": ["abcxyz", "???", "Tôi không hiểu"],
+      "responses": ["Xin lỗi, tôi chưa hiểu yêu cầu của bạn. Bạn có thể nói lại không?"]
+    }
+  ]
+}
