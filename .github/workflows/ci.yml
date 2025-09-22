@@ -1,4 +1,4 @@
-name: CI
+name: CI Chatbot Ecommerce
 
 on:
   push:
@@ -7,35 +7,24 @@ on:
     branches: [ "main" ]
 
 jobs:
-  backend:
+  build-and-test:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Install dependencies
-        run: |
-          cd backend
-          pip install -r requirements.txt
-      - name: Run FastAPI check
-        run: |
-          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload & sleep 5
 
-  frontend:
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
-      - name: Install dependencies
-        run: |
-          cd frontend
-          pip install -r requirements.txt
-      - name: Run Streamlit check
-        run: |
-          streamlit run app.py --server.headless true &
-          sleep 5
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+
+    - name: Run tests
+      run: |
+        pytest -v
