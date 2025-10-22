@@ -3,86 +3,451 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PC Parts Chatbot</title>
-  <!-- Tailwind CDN cho demo nhanh (có thể bỏ nếu site của bạn đã có CSS riêng) -->
+  <title>PC Parts Store - Tư vấn Build PC thông minh</title>
+  <meta name="description" content="Chatbot AI tư vấn linh kiện máy tính, build PC gaming, workstation chuyên nghiệp" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    .chat-shadow { box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    * { font-family: 'Inter', sans-serif; }
+    
+    .chat-shadow { 
+      box-shadow: 0 20px 60px rgba(0,0,0,.15); 
+      transition: all 0.3s ease;
+    }
+    .chat-shadow:hover { box-shadow: 0 25px 70px rgba(0,0,0,.2); }
+    
     .scroll-smooth { scroll-behavior: smooth; }
+    
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .animate-slideUp { animation: slideUp 0.4s ease; }
+    .animate-fadeIn { animation: fadeIn 0.3s ease; }
+    
+    .typing-indicator span {
+      animation: pulse 1.4s infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    
+    .message-bubble {
+      animation: slideUp 0.3s ease;
+    }
+    
+    /* Markdown Styles */
+    .markdown-content h3 { font-weight: 600; margin: 0.5rem 0; }
+    .markdown-content ul, .markdown-content ol { 
+      margin: 0.5rem 0; 
+      padding-left: 1.5rem; 
+    }
+    .markdown-content li { margin: 0.25rem 0; }
+    .markdown-content p { margin: 0.5rem 0; }
+    .markdown-content code {
+      background: rgba(0,0,0,0.05);
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-size: 0.875em;
+    }
+    .markdown-content strong { font-weight: 600; }
+    .markdown-content em { font-style: italic; }
+    
+    /* Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { 
+      background: #888; 
+      border-radius: 3px; 
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #555; }
   </style>
 </head>
-<body class="bg-gray-50">
-  <main class="min-h-screen flex items-center justify-center p-6">
-    <button id="openChat" class="fixed bottom-6 right-6 rounded-full px-5 py-3 bg-black text-white text-sm font-medium chat-shadow">💬 Hỗ trợ linh kiện</button>
-
-    <div id="chatPanel" class="hidden fixed bottom-20 right-6 w-96 max-w-[95vw] bg-white rounded-2xl border border-gray-200 chat-shadow overflow-hidden">
-      <div class="flex items-center justify-between px-4 py-3 bg-black text-white">
-        <div class="font-semibold">Tư vấn build PC</div>
-        <button id="closeChat" title="Đóng">✕</button>
-      </div>
-
-      <div id="messages" class="h-96 overflow-auto p-4 space-y-3 scroll-smooth bg-gray-50">
-        <div class="text-xs text-gray-500">Mẹo: Hãy cho tôi biết ngân sách, mục đích (game/dựng phim/lập trình), và linh kiện bạn đã có.</div>
-      </div>
-
-      <div class="px-3 pb-3">
-        <div id="suggests" class="flex gap-2 flex-wrap px-1 pb-2">
-          <button class="text-xs bg-gray-200 hover:bg-gray-300 rounded-full px-3 py-1">Tư vấn build 20–25tr</button>
-          <button class="text-xs bg-gray-200 hover:bg-gray-300 rounded-full px-3 py-1">So sánh i5-12400F vs R5 5600</button>
-          <button class="text-xs bg-gray-200 hover:bg-gray-300 rounded-full px-3 py-1">Case mini-ITX văn phòng</button>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100">
+  <!-- Hero Section -->
+  <div class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 gradient-bg rounded-lg flex items-center justify-center">
+              <i class="fas fa-desktop text-white"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-gray-900">PC Parts Store</h1>
+              <p class="text-xs text-gray-500">Tư vấn Build PC thông minh</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <a href="#features" class="text-sm text-gray-600 hover:text-gray-900">Tính năng</a>
+            <a href="#demo" class="text-sm text-gray-600 hover:text-gray-900">Demo</a>
+          </div>
         </div>
-        <form id="chatForm" class="flex items-center gap-2">
-          <input id="userInput" class="flex-1 border rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black" placeholder="Nhập câu hỏi…" />
-          <button class="rounded-xl bg-black text-white px-3 py-2 text-sm">Gửi</button>
-        </form>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex items-center justify-center p-6">
+      <div class="max-w-4xl mx-auto text-center">
+        <div class="animate-fadeIn">
+          <div class="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-6">
+            <i class="fas fa-robot mr-2"></i>Powered by Gemini AI
+          </div>
+          <h2 class="text-5xl font-bold text-gray-900 mb-6">
+            Tư vấn Build PC <br/>
+            <span class="gradient-bg bg-clip-text text-transparent">Thông minh & Nhanh chóng</span>
+          </h2>
+          <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            Trợ lý AI giúp bạn chọn linh kiện tương thích, tối ưu ngân sách, 
+            và tư vấn cấu hình phù hợp cho mọi nhu cầu
+          </p>
+          <div class="flex gap-4 justify-center">
+            <button onclick="openChatWidget()" class="px-8 py-4 gradient-bg text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition">
+              <i class="fas fa-comments mr-2"></i>Bắt đầu tư vấn
+            </button>
+            <button onclick="scrollToFeatures()" class="px-8 py-4 bg-white text-gray-700 rounded-xl font-semibold border-2 border-gray-300 hover:border-purple-500 transition">
+              Tìm hiểu thêm
+            </button>
+          </div>
+        </div>
+
+        <!-- Features -->
+        <div id="features" class="grid md:grid-cols-3 gap-6 mt-20">
+          <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4 mx-auto">
+              <i class="fas fa-brain text-white text-xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">AI Thông minh</h3>
+            <p class="text-gray-600 text-sm">Phân tích nhu cầu và đề xuất cấu hình tối ưu dựa trên ngân sách</p>
+          </div>
+          <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4 mx-auto">
+              <i class="fas fa-check-circle text-white text-xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Kiểm tra tương thích</h3>
+            <p class="text-gray-600 text-sm">Đảm bảo các linh kiện hoạt động tốt với nhau</p>
+          </div>
+          <div class="bg-white p-6 rounded-2xl shadow-lg">
+            <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-4 mx-auto">
+              <i class="fas fa-clock text-white text-xl"></i>
+            </div>
+            <h3 class="text-lg font-semibold mb-2">Phản hồi nhanh</h3>
+            <p class="text-gray-600 text-sm">Trả lời ngay lập tức mọi câu hỏi về linh kiện PC</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t">
+      <div class="max-w-7xl mx-auto px-4 py-6 text-center text-sm text-gray-500">
+        <p>© 2025 PC Parts Store. Powered by Gemini AI. Demo project for IS207.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Chat Widget Button -->
+  <button id="openChat" class="fixed bottom-6 right-6 w-16 h-16 gradient-bg text-white rounded-full chat-shadow flex items-center justify-center text-2xl transform hover:scale-110 transition z-50">
+    <i class="fas fa-comments"></i>
+    <span id="unreadBadge" class="hidden absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">1</span>
+  </button>
+
+  <!-- Chat Panel -->
+  <div id="chatPanel" class="hidden fixed bottom-24 right-6 w-[420px] max-w-[calc(100vw-3rem)] glass-effect rounded-3xl border border-gray-200 chat-shadow overflow-hidden z-50">
+    <!-- Header -->
+    <div class="gradient-bg text-white px-5 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div>
+            <div class="font-semibold">Trợ lý Build PC</div>
+            <div class="text-xs opacity-90 flex items-center">
+              <span class="w-2 h-2 bg-green-400 rounded-full mr-2"></span>
+              Đang hoạt động
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button id="clearChat" title="Xóa lịch sử chat" class="w-8 h-8 hover:bg-white/20 rounded-lg flex items-center justify-center transition">
+            <i class="fas fa-trash-alt text-sm"></i>
+          </button>
+          <button id="minimizeChat" title="Thu nhỏ" class="w-8 h-8 hover:bg-white/20 rounded-lg flex items-center justify-center transition">
+            <i class="fas fa-minus text-sm"></i>
+          </button>
+          <button id="closeChat" title="Đóng" class="w-8 h-8 hover:bg-white/20 rounded-lg flex items-center justify-center transition">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       </div>
     </div>
-  </main>
+
+    <!-- Messages -->
+    <div id="messages" class="h-[500px] overflow-auto p-5 space-y-4 bg-gradient-to-b from-gray-50 to-white custom-scrollbar">
+      <div class="flex justify-center">
+        <div class="bg-purple-50 text-purple-700 text-xs px-4 py-2 rounded-full">
+          <i class="fas fa-info-circle mr-1"></i>
+          Hãy cho tôi biết ngân sách, mục đích sử dụng để được tư vấn tốt nhất
+        </div>
+      </div>
+      <div class="flex justify-start message-bubble">
+        <div class="max-w-[85%] bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100">
+          <div class="flex items-center space-x-2 mb-1">
+            <i class="fas fa-robot text-purple-600 text-xs"></i>
+            <span class="text-xs text-gray-500">AI Assistant</span>
+          </div>
+          <div class="text-sm text-gray-700">
+            Xin chào! 👋 Tôi là trợ lý tư vấn linh kiện PC. Tôi có thể giúp bạn:<br/><br/>
+            • Tư vấn build PC theo ngân sách<br/>
+            • So sánh hiệu năng linh kiện<br/>
+            • Kiểm tra tương thích<br/>
+            • Đề xuất nâng cấp<br/><br/>
+            Bạn cần tư vấn gì?
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="border-t bg-white px-4 py-4">
+      <!-- Quick Suggestions -->
+      <div id="suggests" class="flex gap-2 flex-wrap mb-3">
+        <button class="suggest-btn text-xs bg-gradient-to-r from-purple-100 to-pink-100 hover:from-purple-200 hover:to-pink-200 text-purple-700 rounded-full px-3 py-1.5 transition">
+          <i class="fas fa-desktop mr-1"></i>Build gaming 20tr
+        </button>
+        <button class="suggest-btn text-xs bg-gradient-to-r from-blue-100 to-cyan-100 hover:from-blue-200 hover:to-cyan-200 text-blue-700 rounded-full px-3 py-1.5 transition">
+          <i class="fas fa-balance-scale mr-1"></i>So sánh CPU
+        </button>
+        <button class="suggest-btn text-xs bg-gradient-to-r from-green-100 to-emerald-100 hover:from-green-200 hover:to-emerald-200 text-green-700 rounded-full px-3 py-1.5 transition">
+          <i class="fas fa-check-double mr-1"></i>Kiểm tra tương thích
+        </button>
+      </div>
+      
+      <!-- Input Form -->
+      <form id="chatForm" class="flex items-center gap-2">
+        <input 
+          id="userInput" 
+          class="flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-purple-500 transition" 
+          placeholder="Nhập câu hỏi của bạn..." 
+          autocomplete="off"
+        />
+        <button type="submit" class="gradient-bg text-white w-12 h-12 rounded-xl flex items-center justify-center hover:shadow-lg transition transform hover:scale-105">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </form>
+      
+      <div class="text-xs text-gray-400 text-center mt-2">
+        <i class="fas fa-shield-alt mr-1"></i>Dữ liệu được bảo mật
+      </div>
+    </div>
+  </div>
 
   <script>
     const backendUrl = (localStorage.getItem('chat_backend') || 'http://localhost:3001');
-
+    
     const el = {
-      open: document.getElementById('openChat'),
-      close: document.getElementById('closeChat'),
+      openBtn: document.getElementById('openChat'),
+      closeBtn: document.getElementById('closeChat'),
+      minimizeBtn: document.getElementById('minimizeChat'),
+      clearBtn: document.getElementById('clearChat'),
       panel: document.getElementById('chatPanel'),
       msgs: document.getElementById('messages'),
       form: document.getElementById('chatForm'),
       input: document.getElementById('userInput'),
       suggests: document.getElementById('suggests'),
+      unreadBadge: document.getElementById('unreadBadge')
     };
 
     const state = {
       messages: [
-        { role: 'system', content: 'Bạn đang chat với trợ lý tư vấn linh kiện máy tính. Hãy mô tả nhu cầu, ngân sách, game/app bạn dùng.' }
+        { role: 'system', content: 'Bạn đang chat với trợ lý tư vấn linh kiện máy tính.' }
       ],
-      loading: false
+      loading: false,
+      isMinimized: false,
+      unreadCount: 0
     };
 
-    function mdEscape(s){ return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+    // Clear chat history on page load (reset mỗi lần reload)
+    localStorage.removeItem('chatHistory');
 
-    function addMessage(role, content) {
+    // Load chat history from localStorage - DISABLED (always start fresh)
+    function loadChatHistory() {
+      // Không load history nữa - luôn bắt đầu chat mới
+      return;
+      
+      /* COMMENTED OUT - Uncomment if you want to keep chat history
+      const saved = localStorage.getItem('chatHistory');
+      if (saved) {
+        try {
+          const history = JSON.parse(saved);
+          state.messages = history;
+          // Render saved messages
+          history.filter(m => m.role !== 'system').forEach(m => {
+            addMessageToUI(m.role, m.content, false);
+          });
+        } catch (e) {
+          console.error('Failed to load chat history', e);
+        }
+      }
+      */
+    }
+
+    function saveChatHistory() {
+      // Optional: Comment out this line to disable saving completely
+      localStorage.setItem('chatHistory', JSON.stringify(state.messages));
+    }
+
+    function clearChatHistory() {
+      if (confirm('Bạn có chắc muốn xóa toàn bộ lịch sử chat?')) {
+        state.messages = [{ role: 'system', content: 'Bạn đang chat với trợ lý tư vấn linh kiện máy tính.' }];
+        el.msgs.innerHTML = `
+          <div class="flex justify-center">
+            <div class="bg-purple-50 text-purple-700 text-xs px-4 py-2 rounded-full">
+              <i class="fas fa-info-circle mr-1"></i>
+              Hãy cho tôi biết ngân sách, mục đích sử dụng để được tư vấn tốt nhất
+            </div>
+          </div>
+          <div class="flex justify-start message-bubble">
+            <div class="max-w-[85%] bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100">
+              <div class="flex items-center space-x-2 mb-1">
+                <i class="fas fa-robot text-purple-600 text-xs"></i>
+                <span class="text-xs text-gray-500">AI Assistant</span>
+              </div>
+              <div class="text-sm text-gray-700">
+                Xin chào! 👋 Tôi là trợ lý tư vấn linh kiện PC. Tôi có thể giúp bạn:<br/><br/>
+                • Tư vấn build PC theo ngân sách<br/>
+                • So sánh hiệu năng linh kiện<br/>
+                • Kiểm tra tương thích<br/>
+                • Đề xuất nâng cấp<br/><br/>
+                Bạn cần tư vấn gì?
+              </div>
+            </div>
+          </div>
+        `;
+        saveChatHistory();
+      }
+    }
+
+    function parseMarkdown(text) {
+      // Simple markdown parsing
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`(.*?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br/>');
+    }
+
+    function addMessageToUI(role, content, animate = true) {
       const wrap = document.createElement('div');
-      wrap.className = `flex ${role==='user' ? 'justify-end' : 'justify-start'}`;
+      wrap.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} ${animate ? 'message-bubble' : ''}`;
+      
       const bubble = document.createElement('div');
-      bubble.className = `max-w-[80%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm ${role==='user' ? 'bg-black text-white' : 'bg-white border'}`;
-      bubble.innerHTML = mdEscape(content);
+      
+      if (role === 'user') {
+        bubble.className = 'max-w-[85%] gradient-bg text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm';
+        bubble.innerHTML = `<div class="text-sm whitespace-pre-wrap">${escapeHtml(content)}</div>`;
+      } else {
+        bubble.className = 'max-w-[85%] bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100';
+        bubble.innerHTML = `
+          <div class="flex items-center space-x-2 mb-1">
+            <i class="fas fa-robot text-purple-600 text-xs"></i>
+            <span class="text-xs text-gray-500">AI Assistant</span>
+          </div>
+          <div class="text-sm text-gray-700 markdown-content">${parseMarkdown(escapeHtml(content))}</div>
+        `;
+      }
+      
       wrap.appendChild(bubble);
       el.msgs.appendChild(wrap);
       el.msgs.scrollTop = el.msgs.scrollHeight;
     }
 
-    function setLoading(on){
-      state.loading = on;
-      if(on){ addMessage('assistant', 'Đang soạn trả lời…'); }
+    function addTypingIndicator() {
+      const wrap = document.createElement('div');
+      wrap.id = 'typingIndicator';
+      wrap.className = 'flex justify-start message-bubble';
+      wrap.innerHTML = `
+        <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-100">
+          <div class="typing-indicator flex space-x-1">
+            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+          </div>
+        </div>
+      `;
+      el.msgs.appendChild(wrap);
+      el.msgs.scrollTop = el.msgs.scrollHeight;
     }
 
-    el.open.onclick = () => { el.panel.classList.remove('hidden'); };
-    el.close.onclick = () => { el.panel.classList.add('hidden'); };
+    function removeTypingIndicator() {
+      const indicator = document.getElementById('typingIndicator');
+      if (indicator) indicator.remove();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function openChatWidget() {
+      el.panel.classList.remove('hidden');
+      el.openBtn.classList.add('hidden');
+      state.isMinimized = false;
+      state.unreadCount = 0;
+      el.unreadBadge.classList.add('hidden');
+      el.input.focus();
+    }
+
+    function closeChatWidget() {
+      el.panel.classList.add('hidden');
+      el.openBtn.classList.remove('hidden');
+    }
+
+    function minimizeChatWidget() {
+      el.panel.classList.add('hidden');
+      el.openBtn.classList.remove('hidden');
+      state.isMinimized = true;
+    }
+
+    function scrollToFeatures() {
+      document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Event Listeners
+    el.openBtn.onclick = openChatWidget;
+    el.closeBtn.onclick = closeChatWidget;
+    el.minimizeBtn.onclick = minimizeChatWidget;
+    el.clearBtn.onclick = clearChatHistory;
 
     el.suggests.addEventListener('click', (e) => {
-      if (e.target.tagName === 'BUTTON') {
-        el.input.value = e.target.textContent;
+      if (e.target.closest('.suggest-btn')) {
+        const btn = e.target.closest('.suggest-btn');
+        el.input.value = btn.textContent.trim();
         el.input.focus();
       }
     });
@@ -90,34 +455,68 @@
     el.form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const text = el.input.value.trim();
-      if(!text || state.loading) return;
-      addMessage('user', text);
+      if (!text || state.loading) return;
+
+      // Add user message
+      addMessageToUI('user', text);
       state.messages.push({ role: 'user', content: text });
       el.input.value = '';
+      saveChatHistory();
 
-      setLoading(true);
+      // Show typing indicator
+      state.loading = true;
+      addTypingIndicator();
+
       try {
-        const r = await fetch(`${backendUrl}/api/chat`, {
+        const response = await fetch(`${backendUrl}/api/chat`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: state.messages.slice(-12) }) // gửi 12 tin gần nhất
+          body: JSON.stringify({ messages: state.messages.slice(-8) }) // Only send last 8 messages for speed
         });
-        const data = await r.json();
-        // xoá bubble loading cuối cùng
-        el.msgs.lastChild && el.msgs.removeChild(el.msgs.lastChild);
+
+        const data = await response.json();
+        removeTypingIndicator();
+
         if (data.reply) {
-          addMessage('assistant', data.reply);
+          addMessageToUI('assistant', data.reply);
           state.messages.push({ role: 'assistant', content: data.reply });
+          saveChatHistory();
+
+          // Show unread badge if minimized
+          if (state.isMinimized) {
+            state.unreadCount++;
+            el.unreadBadge.textContent = state.unreadCount;
+            el.unreadBadge.classList.remove('hidden');
+          }
         } else {
-          addMessage('assistant', 'Xin lỗi, hiện chưa trả lời được.');
+          addMessageToUI('assistant', 'Xin lỗi, hiện tại tôi không thể trả lời. Vui lòng thử lại sau.');
         }
       } catch (err) {
-        el.msgs.lastChild && el.msgs.removeChild(el.msgs.lastChild);
-        addMessage('assistant', 'Lỗi kết nối server. Vui lòng thử lại.');
-        console.error(err);
+        removeTypingIndicator();
+        addMessageToUI('assistant', '❌ Lỗi kết nối server. Vui lòng kiểm tra kết nối và thử lại.');
+        console.error('Chat error:', err);
       } finally {
-        setLoading(false);
+        state.loading = false;
       }
+    });
+
+    // Keyboard shortcut
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !el.panel.classList.contains('hidden')) {
+        closeChatWidget();
+      }
+    });
+
+    // Load chat history on page load
+    loadChatHistory();
+
+    // Show welcome animation
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        if (state.messages.length <= 1) {
+          // el.unreadBadge.classList.remove('hidden');
+        }
+      }, 2000);
     });
   </script>
 </body>
