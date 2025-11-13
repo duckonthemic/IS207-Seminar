@@ -246,19 +246,6 @@ lsof -ti:3001 | xargs kill -9
 3. Kiểm tra API key và model name
 4. Xem logs trong terminal backend
 
-## 📝 TODO / Future Improvements
-
-- [ ] Streaming response (SSE)
-- [ ] Export chat history (JSON/PDF)
-- [ ] Dark mode
-- [ ] Multi-language support
-- [ ] Voice input/output
-- [ ] Product search integration
-- [ ] Price comparison with real stores
-- [ ] User authentication
-- [ ] Analytics dashboard
-- [ ] Mobile app (React Native)
-
 ## 🤝 Contributing
 
 Pull requests are welcome! For major changes, please open an issue first.
